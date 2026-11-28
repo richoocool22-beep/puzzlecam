@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Puzzle Cam — Galeri Semua Foto (GitHub)</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:#0a0a08;color:#eae5d6;
+    font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+    padding:clamp(14px,4vw,28px)}
+  .wrap{max-width:1060px;margin:0 auto}
+  .head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .head .logo{height:26px}
+  .head span{font-size:12px;letter-spacing:3px;color:#b3ad9e}
+  h1{font-size:clamp(19px,4.5vw,26px);margin:10px 0 4px}
+  p.sub{color:#b3ad9e;font-size:clamp(12px,3vw,13.5px);line-height:1.7;margin:0 0 18px}
+  .kartu{background:#14120e;border:1px solid #2a2620;border-radius:14px;
+    padding:clamp(14px,3vw,20px);margin:0 0 18px}
+  .baris{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .baris:last-child{margin-bottom:0}
+  .kolom{flex:1;min-width:150px;display:flex;flex-direction:column;gap:5px}
+  .kolom label{font-size:10.5px;letter-spacing:1.5px;color:#8a857a}
+  .kolom input{background:#0a0a08;border:1px solid #3a352c;border-radius:10px;
+    color:#eae5d6;padding:11px 12px;font-size:14px;width:100%}
+  .kolom input:focus{outline:none;border-color:#f5c518}
+  button{font-family:inherit;cursor:pointer;border:0;letter-spacing:.4px}
+  .btn{background:#f5c518;color:#1a1400;font-weight:700;border-radius:999px;
+    padding:13px 26px;font-size:14.5px}
+  .btn2{background:#eae5d6;color:#1a1400;font-weight:700;border-radius:999px;
+    padding:12px 22px;font-size:13px}
+  .btn-mini{background:#2a2620;color:#eae5d6;font-weight:700;border-radius:999px;
+    padding:9px 14px;font-size:11.5px}
+  .btn:active,.btn2:active{background:#d9b212}
+  .status{font-size:13px;color:#b3ad9e;margin:10px 0 0;line-height:1.6}
+  .status.merah{color:#ff9a7a}
+  .status.kuning{color:#f5c518}
+  .galeri{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:16px}
+  .kartu-foto{background:#14120e;border:1px solid #2a2620;border-radius:12px;
+    padding:10px;display:flex;flex-direction:column;gap:8px}
+  .kartu-foto img.thumb{width:100%;border-radius:8px;background:#fff;cursor:zoom-in;
+    aspect-ratio:2/3;object-fit:cover;min-height:1px}
+  .kartu-foto .waktu{font-size:11px;color:#b3ad9e;letter-spacing:1px}
+  .kartu-foto .badge{display:inline-block;font-size:9.5px;letter-spacing:1.5px;
+    color:#f5c518;border:1px solid #3a352c;border-radius:999px;padding:4px 10px}
+  .aksi{display:flex;gap:6px;flex-wrap:wrap}
+  .aksi a,.aksi button{background:#2a2620;color:#eae5d6;font-weight:700;
+    border-radius:999px;padding:8px 12px;font-size:10.5px;text-decoration:none;
+    letter-spacing:.3px;flex:1;text-align:center;min-width:0;white-space:nowrap}
+  .aksi .kuning{background:#f5c518;color:#1a1400}
+  .aksi a:active{background:#d9b212}
+  .help{display:none}
+  .help.buka{display:block}
+  .help h3{font-size:14px;margin:14px 0 6px;color:#f5c518}
+  .help ol,.help p{font-size:13px;line-height:1.8;color:#d9d3c4;margin:6px 0;
+    padding-left:22px}
+  .help code{background:#0a0a08;border-radius:6px;padding:2px 7px;
+    font-size:12px;color:#f5c518;word-break:break-all}
+  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);
+    z-index:50;padding:4vh 4vw;overflow:auto;text-align:center}
+  .modal.buka{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .modal img{max-width:min(92vw,560px);border-radius:12px;background:#fff}
+  .modal .aksi{max-width:min(92vw,560px);width:100%}
+  .modal .aksi a,.modal .aksi button{font-size:12px;padding:11px 14px}
+  .tip{font-size:11px;color:#6b665c;line-height:1.7;margin:18px 0 6px;
+    text-align:center}
+  .tanda{font-size:10px;color:#6b665c;letter-spacing:2px;text-align:center;
+    margin-top:22px}
+  .putar{display:inline-block;width:14px;height:14px;border:2px solid #f5c518;
+    border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;
+    vertical-align:-2px;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media (max-width:560px){
+    .galeri{grid-template-columns:repeat(2,1fr);gap:10px}
+    .aksi a,.aksi button{font-size:9.5px;padding:7px 6px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <img class="logo" alt="logo"
+      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==" />
+    <span>PUZZLE·CAM</span>
+  </div>
+  <h1>Galeri Semua Foto</h1>
+  <p class="sub">Membaca SEMUA kirim photobooth langsung dari repo GitHub —
+    riwayat di aplikasi memang cuma tampilan ringan, tapi di GitHub setiap
+    kirim tersimpan permanen (foto 4R + versi original + video live).</p>
+
+  <div class="kartu" id="kartu-setelan">
+    <div class="baris">
+      <div class="kolom">
+        <label>USERNAME GITHUB</label>
+        <input id="inU" placeholder="misal: boothkelurahan" autocomplete="off" />
+      </div>
+      <div class="kolom">
+        <label>NAMA REPO</label>
+        <input id="inR" placeholder="misal: puzzlecam-foto" autocomplete="off" />
+      </div>
+      <div class="kolom">
+        <label>TOKEN (KHUSUS REPO PRIVAT — KOSONGKAN KALAU PUBLIK)</label>
+        <input id="inT" type="password" placeholder="ghp_… (opsional)" autocomplete="off" />
+      </div>
+    </div>
+    <div class="baris">
+      <button class="btn" id="btnBuka">BUKA GALERI</button>
+      <button class="btn2" id="btnPanduan">CARA BAGIKAN KE DIVISI PDD</button>
+    </div>
+    <p class="status" id="st">Isi username &amp; nama repo sesuai
+      <b>⚙ PENGATURAN QR</b> di aplikasi booth, lalu tekan BUKA GALERI.</p>
+  </div>
+
+  <div class="kartu help" id="panduan">
+    <h3>Cara paling gampang melihat semua foto</h3>
+    <ol>
+      <li>Isi username + nama repo di atas (sama seperti di ⚙ PENGATURAN QR
+        aplikasi), tekan <b>BUKA GALERI</b> — semua kirim foto tampil,
+        terbaru dulu, bisa dilihat besar &amp; diunduh satu-satu.</li>
+      <li>Kalau internet booth sering mati (kirim lewat server laptop), file
+        kirim offline itu ada di folder <code>qr-pages/</code> di laptop —
+        buka file <code>.html</code>-nya langsung.</li>
+    </ol>
+    <h3>Cara bagikan ke divisi PDD (paling gampang: 1 link)</h3>
+    <ol>
+      <li>Buka <code>github.com</code> → masuk repo → <b>Settings</b> →
+        <b>General</b> → di bawah <b>Danger Zone</b> pilih
+        <b>Change visibility → Public</b>. (Foto event umumnya memang
+        dibagikan antar-divisi; kalau tidak boleh publik, lihat langkah 4.)</li>
+      <li>Di halaman repo tekan <b>Add file → Upload files</b>, seret
+        <b>GALERI-GITHUB.html</b> (file ini) ke situ → <b>Commit changes</b>.</li>
+      <li>Bagikan SATU link ini ke PDD (ganti <code>USER</code> dan
+        <code>REPO</code>):<br />
+        <code>https://raw.githack.com/USER/REPO/main/GALERI-GITHUB.html?u=USER&amp;r=REPO</code><br />
+        PDD buka di HP/laptop mana pun — langsung kelihatan semua foto,
+        bisa dilihat besar, diunduh, dan tombol HALAMAN LIVE membuka video
+        fotonya. (Kalau repo sudah mengaktifkan GitHub Pages, link
+        <code>https://USER.github.io/REPO/GALERI-GITHUB.html?u=USER&amp;r=REPO</code>
+        juga jalan.)</li>
+      <li><b>Kalau repo harus tetap privat:</b> PDD perlu token baca.
+        Buat token terbatas: GitHub → Settings → Developer settings →
+        <b>Fine-grained tokens</b> → pilih HANYA repo foto itu → permission
+        <b>Contents: Read-only</b> → kirim token itu ke PDD (JANGAN token
+        utama booth — token booth punya hak menulis). PDD menempelkannya
+        di kolom TOKEN di atas, lalu BUKA GALERI.</li>
+      <li>Alternatif tanpa alat: PDD juga bisa langsung buka
+        <code>github.com/USER/REPO</code> — tiap kirim = 1 file
+        <code>puzzlecam-strip-*.html</code> (fotonya) + 1 folder (video
+        live-nya). Tapi galeri ini jauh lebih enak dipakai.</li>
+    </ol>
+  </div>
+
+  <div class="galeri" id="galeri" style="display:none"></div>
+  <p class="tip">Urutan = jam kirim (dari nama file, waktu UTC). Tiap kartu:
+    4R FILTER = persis foto yang dicetak · 4R ORIGINAL = tanpa filter ·
+    HALAMAN LIVE = halaman tamu + video foto bergerak.</p>
+  <div class="tanda">PUZZLE·CAM — GALERI GITHUB</div>
+</div>
+
+<div class="modal" id="modal">
+  <img id="modal-img" alt="foto besar" />
+  <div class="aksi" id="modal-aksi"></div>
+  <button class="btn2" id="modal-tutup">TUTUP</button>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------- util ----------
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, teks) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (teks !== undefined && teks !== null) n.textContent = teks;
+    return n;
+  }
+  function status(msg, warna) {
+    var s = $("st");
+    s.textContent = "";
+    s.appendChild(document.createTextNode(msg));
+    s.className = "status" + (warna ? " " + warna : "");
+  }
+
+  // ---------- helper murni (diuji otomatis via __galeriTest) ----------
+  var REG_STRIP = /^puzzlecam-strip-[0-9]{6}[a-z0-9]{3}\.html$/;
+
+  function parseTree(tree) {
+    var strips = [], dirs = {};
+    (tree || []).forEach(function (f) {
+      if (!f || !f.path) return;
+      if (f.type === "blob" && f.path.indexOf("/") < 0 && REG_STRIP.test(f.path)) {
+        strips.push(f.path);
+      } else if (f.type === "tree" && f.path.indexOf("/") < 0) {
+        dirs[f.path] = true;
+      }
+    });
+    return { strips: strips, dirs: dirs };
+  }
+
+  function sortStrip(daftar) {
+    // nama = puzzlecam-strip-HHMMSSxxx.html — terbaru (jam besar) dulu
+    return (daftar || []).slice().sort().reverse();
+  }
+
+  function waktuDariNama(nama) {
+    var m = /puzzlecam-strip-([0-9]{2})([0-9]{2})([0-9]{2})[a-z0-9]{3}\.html/
+      .exec(nama || "");
+    return m ? m[1] + ":" + m[2] + ":" + m[3] + " UTC" : nama;
+  }
+
+  function extractJpegs(html) {
+    // halaman tamu: [0]=strip filter, [1]=duplikat href, [2]=strip original
+    return (String(html || "").match(/data:image\/jpeg;base64,[A-Za-z0-9+\/=]+/g) || []);
+  }
+
+  function buatKartu(item) {
+    // item = { path, dir, apiBasis, token, fetchFn } — DOM murni, aman XSS
+    var kartu = el("div", "kartu-foto");
+    var img = el("img", "thumb");
+    img.alt = "foto " + waktuDariNama(item.path);
+    kartu.appendChild(img);
+    kartu.appendChild(el("div", "waktu", waktuDariNama(item.path)));
+    if (item.dir) kartu.appendChild(el("span", "badge", "LIVE + VIDEO"));
+
+    var waktu = el("div", "aksi");
+    var bLihat = el("button", null, "LIHAT");
+    bLihat.disabled = true;
+    var aFl = el("a", "kuning", "4R FILTER");
+    aFl.download = item.path.replace(/\.html$/, "-4r.jpg");
+    var aAsli = el("a", null, "4R ORIGINAL");
+    aAsli.download = item.path.replace(/\.html$/, "-4r-original.jpg");
+    var aLive = el("a", null, "HALAMAN LIVE");
+    aLive.target = "_blank";
+    aLive.rel = "noopener";
+    aLive.href = item.apiBasis.live + item.path;
+    waktu.appendChild(bLihat); waktu.appendChild(aFl);
+    waktu.appendChild(aAsli); waktu.appendChild(aLive);
+    kartu.appendChild(waktu);
+
+    function pasang(j) {
+      img.src = j[0];
+      aFl.href = j[0];
+      aAsli.href = j[2] || j[0];
+      bLihat.disabled = false;
+      bLihat.addEventListener("click", function () {
+        bukaModal(j, item.path, aFl.href, aAsli.href);
+      });
+    }
+    return { kartu: kartu, pasang: pasang, img: img, path: item.path };
+  }
+
+  // ---------- modal ----------
+  function bukaModal(j, path, hrefFl, hrefAsli) {
+    $("modal-img").src = j[0];
+    var a = $("modal-aksi");
+    a.textContent = "";
+    var a1 = el("a", "kuning", "UNDUH 4R FILTER");
+    a1.href = hrefFl;
+    a1.download = path.replace(/\.html$/, "-4r.jpg");
+    var a2 = el("a", null, "UNDUH 4R ORIGINAL");
+    a2.href = hrefAsli;
+    a2.download = path.replace(/\.html$/, "-4r-original.jpg");
+    a.appendChild(a1); a.appendChild(a2);
+    $("modal").classList.add("buka");
+  }
+  $("modal-tutup").addEventListener("click", function () {
+    $("modal").classList.remove("buka");
+  });
+  $("modal").addEventListener("click", function (ev) {
+    if (ev.target === $("modal")) $("modal").classList.remove("buka");
+  });
+
+  // ---------- ambil data ----------
+  function headerAuth(token) {
+    return token ? { "Authorization": "Bearer " + token } : null;
+  }
+  function fetchTimeout(url, opts, ms) {
+    var c = new AbortController();
+    var t = setTimeout(function () { c.abort(); }, ms || 20000);
+    return fetch(url, Object.assign({ signal: c.signal }, opts || {}))
+      .finally(function () { clearTimeout(t); });
+  }
+
+  function muatGaleri() {
+    var u = $("inU").value.trim(), r = $("inR").value.trim(),
+      t = $("inT").value.trim();
+    if (!u || !r) { status("Username & nama repo wajib diisi.", "merah"); return; }
+    try {
+      localStorage.setItem("gc_u", u);
+      localStorage.setItem("gc_r", r);
+      if (t) localStorage.setItem("gc_t", t); else localStorage.removeItem("gc_t");
+    } catch (e) { /* mode privat browser — abaikan */ }
+
+    status("Membaca daftar kirim di repo " + u + "/" + r + "…", "kuning");
+    var h = headerAuth(t);
+    var opts = h ? { headers: h } : null;
+    fetchTimeout("https://api.github.com/repos/" + encodeURIComponent(u) + "/" +
+      encodeURIComponent(r) + "/git/trees/main?recursive=1", opts, 20000)
+      .then(function (res) {
+        if (res.status === 401) throw new Error("TOKEN salah atau kedaluwarsa.");
+        if (res.status === 404) throw new Error("Repo tidak ketemu — cek username/nama repo, atau repo masih kosong (belum ada kirim).");
+        if (!res.ok) throw new Error("GitHub menjawab " + res.status + (res.status === 403 ? " — batas akses: coba lagi nanti atau pakai token." : ""));
+        return res.json();
+      })
+      .then(function (data) {
+        var hasil = parseTree(data.tree);
+        if (!hasil.strips.length) {
+          status("Belum ada kirim di repo ini (belum ada foto terkirim).");
+          return;
+        }
+        render({ strips: sortStrip(hasil.strips), dirs: hasil.dirs }, u, r, t);
+      })
+      .catch(function (e) {
+        status("GAGAL: " + (e && e.message ? e.message : "jaringan") +
+          " — periksa koneksi lalu coba lagi.", "merah");
+      });
+  }
+
+  function render(hasil, u, r, t) {
+    var g = $("galeri");
+    g.textContent = "";
+    g.style.display = "";
+    $("kartu-setelan").classList.add("selesai");
+    var total = hasil.strips.length;
+    status(total + " kirim foto ketemu — foto dimuat selagi digulir " +
+      "(terbaru dulu).", "kuning");
+
+    var apiBasis = {
+      raw: "https://raw.githubusercontent.com/" + encodeURIComponent(u) + "/" +
+        encodeURIComponent(r) + "/main/",
+      api: "https://api.github.com/repos/" + encodeURIComponent(u) + "/" +
+        encodeURIComponent(r) + "/contents/",
+      live: "https://raw.githack.com/" + encodeURIComponent(u) + "/" +
+        encodeURIComponent(r) + "/main/"
+    };
+
+    function ambilKonten(path) {
+      // privat -> API raw (CORS rapi); publik -> CDN raw.githubusercontent
+      if (t) {
+        return fetchTimeout(apiBasis.api + encodeURIComponent(path) +
+          "?ref=main", { headers: Object.assign({
+            Accept: "application/vnd.github.raw" }, headerAuth(t)) }, 25000)
+          .then(function (x) { return x.text(); });
+      }
+      return fetchTimeout(apiBasis.raw + encodeURIComponent(path), null, 25000)
+        .then(function (x) { return x.text(); });
+    }
+
+    var io = ("IntersectionObserver" in window)
+      ? new IntersectionObserver(function (entri) {
+          entri.forEach(function (en) {
+            if (!en.isIntersecting) return;
+            io.unobserve(en.target);
+            var k = en.target.__kartu;
+            ambilKonten(k.path)
+              .then(function (html) {
+                var j = extractJpegs(html);
+                if (j.length) k.pasang(j);
+                else k.img.alt = "foto tak terbaca";
+              })
+              .catch(function () { k.img.alt = "gagal memuat foto"; });
+          });
+        }, { rootMargin: "600px" })
+      : null;
+
+    hasil.strips.forEach(function (path) {
+      var k = buatKartu({ path: path, dir: hasil.dirs[path.replace(/\.html$/, "")],
+        apiBasis: apiBasis });
+      k.img.__kartu = k;
+      g.appendChild(k.kartu);
+      if (io) io.observe(k.img);
+      else ambilKonten(path).then(function (html) {
+        var j = extractJpegs(html);
+        if (j.length) k.pasang(j);
+      }).catch(function () {});
+    });
+  }
+
+  // ---------- setelan & panduan ----------
+  $("btnBuka").addEventListener("click", muatGaleri);
+  $("btnPanduan").addEventListener("click", function () {
+    var p = $("panduan");
+    p.classList.toggle("buka");
+    this.textContent = p.classList.contains("buka")
+      ? "TUTUP PANDUAN" : "CARA BAGIKAN KE DIVISI PDD";
+  });
+  $("inT").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") muatGaleri();
+  });
+  $("inR").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") muatGaleri();
+  });
+
+  var QS = new URLSearchParams(location.search);
+  var awalU = QS.get("u") || "", awalR = QS.get("r") || "";
+  var simpanU = "", simpanR = "", simpanT = "";
+  try {
+    simpanU = localStorage.getItem("gc_u") || "";
+    simpanR = localStorage.getItem("gc_r") || "";
+    simpanT = localStorage.getItem("gc_t") || "";
+  } catch (e) { /* abaikan */ }
+  $("inU").value = awalU || simpanU;
+  $("inR").value = awalR || simpanR;
+  $("inT").value = simpanT;
+  if ((awalU || simpanU) && (awalR || simpanR)) muatGaleri();
+
+  // ---------- ekspos untuk uji otomatis ----------
+  window.__galeriTest = {
+    parseTree: parseTree, sortStrip: sortStrip,
+    waktuDariNama: waktuDariNama, extractJpegs: extractJpegs,
+    buatKartu: buatKartu
+  };
+})();
+</script>
+</body>
+</html>
